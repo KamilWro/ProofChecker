@@ -1,0 +1,17 @@
+proof
+[ A : A ];
+A => A
+end.
+
+proof
+[ A : [ B : A];
+B => A];
+A => B => A
+end.
+
+proof
+[ A :
+[ A : A ];
+A => A ];
+A => A => A
+end.

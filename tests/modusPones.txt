@@ -1,0 +1,8 @@
+goal modusPonens: A /\ (A => B) => B
+proof
+[ A /\ (A => B) :
+A;
+A => B;
+B ];
+A /\ (A => B) => B
+end.

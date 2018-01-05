@@ -1,0 +1,14 @@
+goal importation: (A => B => C) => (A /\ B => C)
+proof
+[(A => B => C):
+[A /\ B :
+A /\ B;
+A /\ B;
+A;
+A => B => C;
+B => C;
+B;
+C];
+A /\ B => C];
+(A => B => C) => (A /\ B => C)
+end.

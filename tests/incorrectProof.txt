@@ -1,0 +1,4 @@
+proof
+A;
+A
+end.

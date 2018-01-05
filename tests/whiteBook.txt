@@ -1,0 +1,38 @@
+goal principleOfExcludedMiddle: A \/ ~A
+proof
+[ ~(A \/ ~A):
+[A:
+A;
+(A \/ ~A);
+~(A \/ ~A);
+F];
+~A;
+A \/ ~A;
+~(A \/ ~A);
+F];
+~~(A \/ ~A);
+A \/ ~A
+end.
+
+goal deMorgansLaw: ~(A \/ B) => ~A /\ ~B
+proof
+[~(A \/ B):
+[A:
+A;
+A \/ B;
+~(A \/ B);
+F
+];
+[B:
+B;
+A \/ B;
+~(A \/ B);
+F
+];
+~A;
+~B;
+~A /\ ~B
+];
+~(A \/ B) => ~A /\ ~B
+end.
+
