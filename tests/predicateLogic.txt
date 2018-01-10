@@ -1,0 +1,35 @@
+goal implicationProof: (V x.(A(x) /\ B(x))) => (V x.A(x)) /\ (V x.B(x))
+proof
+[(V x.(A(x) /\ B(x))):
+[[x0]:
+V x.(A(x) /\ B(x));
+A(x/x0) /\ B(x/x0);
+A(x/x0)
+];
+[[x1]:
+V x.(A(x) /\ B(x));
+A(x/x1) /\ B(x/x1);
+B(x/x1)
+];
+V x.A(x);
+V x.B(x);
+(V x.A(x)) /\ (V x.B(x))
+];
+(V x.(A(x) /\ B(x))) => (V x.A(x)) /\ (V x.B(x))
+end.
+
+goal deMorgansLaws: (~E x. A(x)) => (V x. ~A(x))
+proof
+[(~E x. A(x)):
+[[x0]:
+[A(x/x0):
+A(x/x0);
+(E x. A(x));
+(~E x. A(x));
+F];
+~A(x/x0)
+];
+(V x. ~A(x))
+];
+(~E x. A(x)) => (V x. ~A(x))
+end.

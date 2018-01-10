@@ -1,0 +1,83 @@
+(* Z treści zadania *)
+proof
+[ A : A ];
+A => A
+end.
+
+proof
+[ A : [ B : A];
+B => A];
+A => B => A
+end.
+
+proof
+[ A :
+[ A : A ];
+A => A ];
+A => A => A
+end.
+
+goal modusPonens: A /\ (A => B) => B
+proof
+[ A /\ (A => B) :
+A;
+A => B;
+B ];
+A /\ (A => B) => B
+end.
+
+(* Z wykładu Programowanie Funkcyjne *)
+goal importation: (A => B => C) => (A /\ B => C)
+proof
+[(A => B => C):
+[A /\ B :
+A /\ B;
+A /\ B;
+A;
+A => B => C;
+B => C;
+B;
+C];
+A /\ B => C];
+(A => B => C) => (A /\ B => C)
+end.
+
+(* WhiteBook *)
+goal principleOfExcludedMiddle: A \/ ~A
+proof
+[ ~(A \/ ~A):
+[A:
+A;
+(A \/ ~A);
+~(A \/ ~A);
+F];
+~A;
+A \/ ~A;
+~(A \/ ~A);
+F];
+~~(A \/ ~A);
+A \/ ~A
+end.
+
+goal deMorgansLaw: ~(A \/ B) => ~A /\ ~B
+proof
+[~(A \/ B):
+[A:
+A;
+A \/ B;
+~(A \/ B);
+F
+];
+[B:
+B;
+A \/ B;
+~(A \/ B);
+F
+];
+~A;
+~B;
+~A /\ ~B
+];
+~(A \/ B) => ~A /\ ~B
+end.
+

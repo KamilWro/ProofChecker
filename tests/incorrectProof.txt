@@ -2,3 +2,31 @@ proof
 A;
 A
 end.
+
+goal deMorgansLaws: (~E x. A(x)) => (V x. ~A(x))
+proof
+[(~E x. A(x)):
+[[x1]:
+[A(x/x0):
+A(x/x0);
+(E x. A(x));
+(~E x. A(x));
+F];
+~A(x/x0)
+];
+(V x. ~A(x))
+];
+(~E x. A(x)) => (V x. ~A(x))
+end.
+
+proof
+[E x. p(x):
+[[x0]:
+[[x0],p(x0):
+p(x0)]
+E x. p(x)
+p(x0)];
+V x. p(x)
+];
+(E x. p(x)) => V x. p(x)
+end.

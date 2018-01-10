@@ -1,7 +1,7 @@
 {
 open Parser
 open Lexing
-open Datatypes
+open DataTypes
 
 let next_line lexbuf =
   let pos = lexbuf.lex_curr_p in
@@ -16,14 +16,18 @@ let alpha = [ 'a'-'z' 'A' - 'Z' ]
 let white = [' ' '\t']+ 
 let newline = '\r' | '\n' | "\r\n"
 let var = alpha (alpha|digit|'_')* 
+let comments = "(*" _* "*)"
 
 rule read = parse
-  white                     { read lexbuf }
+| "(*" 						{ read_comment lexbuf }
+| white                     { read lexbuf }
 | newline                   { next_line lexbuf; read lexbuf }
 | "goal"                    { GOAL }
 | "proof"                   { PROOF }
 | "end"                     { END }  
 | "axiom"                   { AXIOM } 
+| "ref"						{ REF }
+| ","                       { COMMA }
 | ";"                       { SEMICOLON }
 | "["                       { LSQUARE }
 | "]"                       { RSQUARE }
@@ -32,12 +36,22 @@ rule read = parse
 | ":"                       { COLON }
 | "\\/"                     { OR }
 | "/\\"                     { AND}
+| "/"                       { RHOMB }
 | "=>"                      { IMP }
 | "~"                       { NOT }
 | "<=>"                     { EQ }
 | "."                       { DOT }
 | "T"                       { TRUE }
-| "F"                       { FALSE }  
+| "F"                       { FALSE }
+| "V"                       { FORALL }
+| "E"                       { EXISTS }
 | var                       { VAR (lexeme lexbuf)}
 | eof                       { EOF }
 | _                         { raise @@ SyntaxError "Unexpected character" }
+
+and read_comment = parse
+| white                     { read_comment lexbuf }
+| newline                   { next_line lexbuf; read_comment lexbuf }
+| eof                       { EOF }
+| "*)"						{ read lexbuf }
+| _ 						{ read_comment lexbuf }
