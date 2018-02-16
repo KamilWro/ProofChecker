@@ -5,17 +5,15 @@ open DataTypes
 
 let next_line lexbuf =
   let pos = lexbuf.lex_curr_p in
-  lexbuf.lex_curr_p <-
-    { pos with pos_bol = lexbuf.lex_curr_pos;
-               pos_lnum = pos.pos_lnum + 1
-    }
+  lexbuf.lex_curr_p <- { pos with pos_bol = lexbuf.lex_curr_pos; pos_lnum = pos.pos_lnum + 1 }
 }
 
 let digit = [ '0'-'9' ] 
 let alpha = [ 'a'-'z' 'A' - 'Z' ]         
 let white = [' ' '\t']+ 
 let newline = '\r' | '\n' | "\r\n"
-let var = alpha (alpha|digit|'_')* 
+let var = [ 'a' - 'z' ] (alpha|digit|'_')*
+let type = [ 'A' - 'Z' ] (alpha|digit|'_')* 
 let comments = "(*" _* "*)"
 
 rule read = parse
@@ -26,7 +24,7 @@ rule read = parse
 | "proof"                   { PROOF }
 | "end"                     { END }  
 | "axiom"                   { AXIOM } 
-| "ref"						{ REF }
+| "type"					{ TYPE }
 | ","                       { COMMA }
 | ";"                       { SEMICOLON }
 | "["                       { LSQUARE }
@@ -36,18 +34,19 @@ rule read = parse
 | ":"                       { COLON }
 | "\\/"                     { OR }
 | "/\\"                     { AND}
-| "/"                       { RHOMB }
 | "=>"                      { IMP }
 | "~"                       { NOT }
-| "<=>"                     { EQ }
+| "<=>"                     { EQV }
 | "."                       { DOT }
+| "="                       { EQ }
 | "T"                       { TRUE }
 | "F"                       { FALSE }
 | "V"                       { FORALL }
 | "E"                       { EXISTS }
-| var                       { VAR (lexeme lexbuf)}
+| type 						{ TYPE_NAME (lexeme lexbuf) }
+| var                       { VAR (lexeme lexbuf) }
 | eof                       { EOF }
-| _                         { raise @@ SyntaxError "Unexpected character" }
+| _                         { raise @@ Syntax_Error "Unexpected character" }
 
 and read_comment = parse
 | white                     { read_comment lexbuf }

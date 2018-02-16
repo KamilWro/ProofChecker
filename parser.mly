@@ -1,82 +1,94 @@
 %{
   open DataTypes
   open Lexing
-  module PairMap = Map.Make(String)
 %}
 
 %token EOF
-%token DOT SEMICOLON COLON LSQUARE RSQUARE LPAREN RPAREN COMMA RHOMB
-%token OR AND IMP NOT EQ
-%token PROOF END GOAL AXIOM REF
+%token DOT SEMICOLON COLON LSQUARE RSQUARE LPAREN RPAREN COMMA
+%token OR AND IMP NOT EQV EQ
+%token PROOF END GOAL AXIOM TYPE
 %token TRUE FALSE 
 %token FORALL EXISTS
 %token <string> VAR
+%token <string> TYPE_NAME
 
-%left EQ
+%left EQV
 %right IMP
 %left OR
 %left AND 
-%right NOT
+%left EQ
+%nonassoc NOT
+%nonassoc UEXISTS
+%nonassoc UFORALL
 
-%start <Lexing.position DataTypes.typeCheckResult> prog
+%start <Lexing.position DataTypes.type_check_result> prog
 
 %%
 
 prog:
-  | EOF       { EOF }
+  | EOF { EOF }
   | v = definition { v } 
 ; 
 
 definition:
-	| GOAL; title = VAR; COLON; expr = expression; PROOF; nd = naturalDeduction; END; DOT { Goal(title, expr, nd) } 
-	| PROOF; nd = naturalDeduction; END; DOT {Proof nd}
-	| AXIOM; title = VAR; COLON; expr = expression; DOT {Axiom (title,expr)}
-	| {raise (SyntaxError "incorrect definition")} 
+  | GOAL; id = VAR; COLON; expr = expression; PROOF; nd = natural_deduction; END; DOT { Goal(id, expr, nd) } 
+  | PROOF; nd = natural_deduction; END; DOT { Proof nd }
+  | AXIOM; expr = expression; DOT { Axiom expr }
+  | TYPE; id = VAR; LPAREN; RPAREN; EQ; t = TYPE_NAME; DOT { Type(id, t) }
+  | { raise (Syntax_Error "incorrect definition") } 
 ;
 
-naturalDeduction: 
-	| list = revNaturalDeduction { List.rev list }
-	| {raise (SyntaxError "incorrect proof")} 
+natural_deduction: 
+  | list = rev_natural_deduction { List.rev list }
 ;
 
-revNaturalDeduction:
+rev_natural_deduction:
   | { [] }
-  | xs = revNaturalDeduction; SEMICOLON; x = proof { x :: xs }
+  | xs = rev_natural_deduction; SEMICOLON; x = proof { x :: xs }
   | x = proof { [x] }
 ;
 
 proof:
-	| LSQUARE; premise = expression; COLON; nd = naturalDeduction; RSQUARE {Inset(premise, nd, $symbolstartpos)}
-	| LSQUARE; LSQUARE; x = VAR; RSQUARE; COMMA; premise = expression; COLON; nd = naturalDeduction; RSQUARE {FreshInset(x, Some premise, nd, $symbolstartpos)}
-	| LSQUARE; LSQUARE; x = VAR; RSQUARE; COLON; nd = naturalDeduction; RSQUARE {FreshInset(x, None, nd, $symbolstartpos)}
-	| x = expression {Expr x}
-	| {raise (SyntaxError "incorrect expression")} 
+  | LSQUARE; premise = expression; COLON; nd = natural_deduction; RSQUARE { Inset(premise, nd, $symbolstartpos) }
+  | LSQUARE; LSQUARE; x = VAR; RSQUARE; COMMA; premise = expression; COLON; nd = natural_deduction; RSQUARE { Fresh_Inset((x, None), Some premise, nd, $symbolstartpos) }
+  | LSQUARE; LSQUARE; x = VAR; COLON; t = TYPE_NAME; RSQUARE; COMMA; premise = expression; COLON; nd = natural_deduction; RSQUARE { Fresh_Inset((x, Some t), Some premise, nd, $symbolstartpos) }
+  | LSQUARE; LSQUARE; x = VAR; COLON; t = TYPE_NAME; RSQUARE; COLON; nd = natural_deduction; RSQUARE { Fresh_Inset((x, Some t), None, nd, $symbolstartpos) }
+  | LSQUARE; LSQUARE; x = VAR; RSQUARE; COLON; nd = natural_deduction; RSQUARE { Fresh_Inset((x, None), None, nd, $symbolstartpos) }
+  | x = expression { Expr (x, $symbolstartpos) }
+  | { raise (Syntax_Error "incorrect expression") } 
 ;
 
 expression:
-	| FORALL; x = VAR; DOT; e = expression {Forall(x,e,$symbolstartpos)}
-	| EXISTS; x = VAR; DOT; e = expression {Exists(x,e,$symbolstartpos)}
-	| REF; x = VAR; {Ref(x,$symbolstartpos)}
- 	| f1 = expression; EQ; f2 = expression { Eq(f1, f2, $symbolstartpos) }
- 	| f1 = expression; IMP; f2 = expression { Imp(f1, f2, $symbolstartpos) }
- 	| f1 = expression; OR; f2 = expression { Or(f1, f2, $symbolstartpos) }
- 	| f1 = expression; AND; f2 = expression { And(f1, f2, $symbolstartpos) }
- 	| NOT; f = expression {Not (f,$symbolstartpos)}
- 	| x = VAR; lists = vars { let xs,ys = lists in Atom (x, xs, ys, $symbolstartpos)}
- 	| LPAREN; x = expression; RPAREN {x}
- 	| TRUE { True($symbolstartpos) }
- 	| FALSE { False($symbolstartpos) }
- 	| {raise (SyntaxError "incorrect expression")} 
+  | t1 = term; EQ; t2 = term { Eq(t1, t2) }
+  | e1 = expression; EQV; e2 = expression { Eqv(e1, e2) }
+  | e1 = expression; IMP; e2 = expression { Imp(e1, e2) }
+  | e1 = expression; OR; e2 = expression { Or(e1, e2) }
+  | e1 = expression; AND; e2 = expression { And(e1, e2) }
+  | NOT; e = expression { Not (e) }
+  | id = VAR; xs = terms { Atom (id, xs) }
+  | id = VAR { Atom (id, [])  }
+  | LPAREN; x = expression; RPAREN { x }
+  | TRUE { True }
+  | FALSE { False }
+  | FORALL; x = VAR; DOT; e = expression %prec UFORALL { Forall((x, None), e) }
+  | FORALL; x = VAR; COLON; t = TYPE_NAME; DOT; e = expression %prec UFORALL { Forall((x, Some(t)), e) }
+  | EXISTS; x = VAR; DOT; e = expression %prec UEXISTS { Exists((x, None), e) }
+  | EXISTS; x = VAR; COLON; t = TYPE_NAME; DOT; e = expression %prec UEXISTS { Exists((x, Some(t)), e) }
+  | { raise (Syntax_Error "incorrect expression") } 
 ;
 
-vars: 
-	| { [],[] }
-	| LPAREN; lists = revVars; RPAREN { lists }
+term:
+  | id = VAR; xs = terms { Function(id, xs) }
+  | var = VAR; { Var var }
+  | { raise (Syntax_Error "incorrect term") } 
+;  
+
+terms:
+  | LPAREN; RPAREN; { [] }
+  | LPAREN; list = rev_terms; RPAREN { list }
 ;
 
-revVars:
-  | lists = revVars; COMMA; x = VAR { let xs,ys = lists in (x::xs,ys) }
-  | lists = revVars; COMMA; x = VAR; RHOMB; y = VAR { let xs,ys = lists in (xs,(x,y)::ys) }
-  | x = VAR; RHOMB; y = VAR { [],[x,y] }
-  | x = VAR; {[x],[]}
+rev_terms:
+  | xs = rev_terms; COMMA; x = term { x :: xs }
+  | x = term { [x] }
 ;
