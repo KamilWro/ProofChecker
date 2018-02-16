@@ -1,35 +1,110 @@
-goal implicationProof: (V x.(A(x) /\ B(x))) => (V x.A(x)) /\ (V x.B(x))
+goal implicationProof: (V x.(p(x) /\ q(x))) => (V x.p(x)) /\ (V x.q(x))
 proof
-[(V x.(A(x) /\ B(x))):
-[[x0]:
-V x.(A(x) /\ B(x));
-A(x/x0) /\ B(x/x0);
-A(x/x0)
+[(V x.(p(x) /\ q(x))):
+  [[x0]:
+    p(x0) /\ q(x0);
+    p(x0)
+  ];
+  [[x1]:
+    V x.(p(x) /\ q(x));
+    p(x1) /\ q(x1);
+    q(x1)
+  ];
+  V x.p(x);
+  V x.q(x);
+  (V x.p(x)) /\ (V x.q(x))
 ];
-[[x1]:
-V x.(A(x) /\ B(x));
-A(x/x1) /\ B(x/x1);
-B(x/x1)
-];
-V x.A(x);
-V x.B(x);
-(V x.A(x)) /\ (V x.B(x))
-];
-(V x.(A(x) /\ B(x))) => (V x.A(x)) /\ (V x.B(x))
+(V x.(p(x) /\ q(x))) => (V x.p(x)) /\ (V x.q(x))
 end.
 
-goal deMorgansLaws: (~E x. A(x)) => (V x. ~A(x))
+goal deMorgansLaws: (~E x. p(x)) => (V x. ~p(x))
 proof
-[(~E x. A(x)):
-[[x0]:
-[A(x/x0):
-A(x/x0);
-(E x. A(x));
-(~E x. A(x));
-F];
-~A(x/x0)
+[(~E x. p(x)):
+  [[x0]:
+    [p(x0):
+      p(x0);
+      (E x. p(x));
+      (~E x. p(x));
+      F
+    ];
+    ~p(x0)
+  ];
+  (V x. ~p(x))
 ];
-(V x. ~A(x))
+(~E x. p(x)) => (V x. ~p(x))
+end.
+
+proof
+[[x0:Nat]:
+  [[y0:Nat]:
+    [[z0:Nat]:
+      [x0 = y0 /\ y0 = z0:
+        x0 = y0;
+        y0 = z0;
+        x0 = z0
+      ];
+      (x0 = y0 /\ y0 = z0 => x0 = z0)
+    ];
+    V z:Nat. (x0 = y0 /\ y0 = z => x0 = z)
+  ];
+  V y:Nat. V z:Nat. (x0 = y /\ y = z => x0 = z)
 ];
-(~E x. A(x)) => (V x. ~A(x))
+V x:Nat. V y:Nat. V z:Nat. (x = y /\ y = z => x = z)
+end.
+
+proof
+[E x. (p(x) \/ q(x)):
+  [[x0], p(x0) \/ q(x0):
+    [p(x0):
+      p(x0);
+      E x. p(x);
+      E x. p(x) \/ E x. q(x)
+    ];
+    [q(x0):
+      q(x0);
+      E x. q(x);    
+      E x. p(x) \/ E x. q(x)
+    ];
+    p(x0) \/ q(x0);
+    E x. p(x) \/ E x. q(x)
+  ];
+  E x. (p(x) \/ q(x));
+  E x. p(x) \/ E x. q(x)   
+];
+E x. (p(x) \/ q(x)) => E x. p(x) \/ E x. q(x)
+end.
+
+proof
+[V x. (p(x) => ~q(x)):
+  [E x. (p(x) /\ q(x)):
+    [[x0], p(x0) /\ q(x0): 
+          V x.(p(x) => ~q(x));
+        p(x0) => ~q(x0);
+          p(x0) /\ q(x0);
+        p(x0);
+      ~q(x0);
+        p(x0) /\ q(x0);
+      q(x0);  
+      F
+    ];
+    E x. (p(x) /\ q(x));
+    F
+  ];
+  ~E x. (p(x) /\ q(x))
+];
+V x. (p(x) => ~q(x)) => ~E x. (p(x) /\ q(x))
+end.
+
+proof
+[[x0:Nat]:
+  [[y0:Nat]:
+    [x0 = y0:
+      odejmij(x0,y0) = odejmij(x0, y0);            
+      odejmij(x0, y0) = odejmij(y0, x0)
+    ];
+    x0 = y0 => odejmij(x0, y0) = odejmij(y0, x0)
+  ];
+  V y:Nat. (x0 = y => odejmij(x0, y) = odejmij(y, x0))
+];
+V x:Nat. V y:Nat. (x = y => odejmij(x, y) = odejmij(y, x))
 end.

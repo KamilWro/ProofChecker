@@ -1,0 +1,63 @@
+(* ----------------------------- Korzystanie z aksjomatów ----------------------------- *)
+
+axiom p /\ q .
+
+proof
+[p:
+  r/\ s
+];
+p => r /\ s
+end.
+
+axiom (V x. p ) <=> p .
+
+proof
+[V x. r(x):
+  [[y0]:
+    V x. r(x) 
+  ];
+  V y. V x. r(x)
+];
+V x. r(x) => V y. V x. r(x)
+end.
+
+type zero() = Nat.
+axiom V x:Nat. (plus(zero(),x) = x).
+
+proof
+V x:Nat. zero() = plus(zero(), zero())  
+end.
+
+proof
+V x:Nat. (x = plus(zero(), x))
+end.
+
+axiom V x:Nat. V y:Nat. ( plus(x, y) = plus(y, x) ).
+axiom V x:Nat. V y:Nat. V z:Nat. ( plus( plus(x, y), z) = plus(x, plus(y, z)) ).
+
+proof
+[[x0: Nat]:
+  [[y0: Nat]:
+    [[z0: Nat]:
+            V y0 : Nat. (V z0 : Nat. ( plus(y0, z0) = plus(z0, y0) ));
+          V z0:Nat. ( plus(y0, z0) = plus(z0, y0) );
+        plus(y0, z0) = plus(z0, y0);
+              V x0:Nat. V y0:Nat. V z0:Nat. ( plus( plus(x0, y0), z0) = plus(x0, plus(y0, z0)));
+            V y0:Nat. V z0:Nat. ( plus( plus(x0, y0), z0) = plus(x0, plus(y0, z0)));
+          V z0:Nat. ( plus( plus(x0, y0), z0) = plus(x0, plus(y0, z0)));
+        plus(plus(x0, y0), z0) = plus(x0, plus(y0, z0));
+      plus(plus(x0, y0), z0) = plus(x0, plus(z0, y0));
+
+            V x0:Nat. V z0:Nat. V y0:Nat. ( plus( plus(x0, z0), y0) = plus(x0, plus(z0, y0)));
+          V z0:Nat. V y0:Nat. ( plus( plus(x0, z0), y0) = plus(x0, plus(z0, y0)));
+        V y0:Nat. ( plus( plus(x0, z0), y0) = plus(x0, plus(z0, y0)));
+      plus( plus(x0, z0), y0) = plus(x0, plus(z0, y0));
+      
+      plus(plus(x0, y0), z0) = plus(plus(x0, z0), y0)
+    ];
+    V z:Nat. ( plus(plus(x0, y0), z) = plus(plus(x0, z), y0) )
+  ];
+  V y:Nat. V z:Nat. ( plus(plus(x0, y), z) = plus(plus(x0, z), y) )
+];
+V x:Nat. V y:Nat. V z:Nat. ( plus(plus(x, y), z) = plus(plus(x, z), y) )
+end.

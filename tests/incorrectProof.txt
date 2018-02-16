@@ -1,32 +1,123 @@
+(* brak dowodu dla p *)
 proof
-A;
-A
+p;
+p
 end.
 
-goal deMorgansLaws: (~E x. A(x)) => (V x. ~A(x))
+(* dowód bez użycia świeżej zmiennej x1 *)
+goal deMorgansLaws: (~E x. p(x)) => (V x. ~p(x))
 proof
-[(~E x. A(x)):
-[[x1]:
-[A(x/x0):
-A(x/x0);
-(E x. A(x));
-(~E x. A(x));
-F];
-~A(x/x0)
+[(~E x. p(x)):
+  [[x1]:
+    [p(x0):
+      p(x0);
+      (E x. p(x));
+      (~E x. p(x));
+      F
+    ];
+    ~p(x0)
+  ];
+  (V x. ~p(x))
 ];
-(V x. ~A(x))
-];
-(~E x. A(x)) => (V x. ~A(x))
+(~E x. p(x)) => (V x. ~p(x))
 end.
 
+(* świeża zmienna występuje już w dowodzie *)
 proof
 [E x. p(x):
-[[x0]:
-[[x0],p(x0):
-p(x0)]
-E x. p(x)
-p(x0)];
-V x. p(x)
+  [[x0]:
+    [[x0],p(x0):
+      p(x0)
+    ];
+    E x. p(x);
+    p(x0)
+  ];
+  V x. p(x)
 ];
 (E x. p(x)) => V x. p(x)
+end.
+
+axiom (V x:Nat. (plus(zero(),x) = x)) .
+
+(* funkcja succ != funkcja plus *)
+proof
+[[x0:Nat]:
+  succ(x0) = succ(zero(), succ(x0)) 
+];
+V x:Nat. (succ(x) = succ(zero(), succ(x)))
+end.
+
+(* świeża zmienna występuje już w dowodzie *)
+proof
+[V x0. p(x0):
+  [[x0]:
+    V x0. p(x0)
+  ];
+  V x. V x0. p(x0) 
+];
+V x0. p(x0) => V y. V x. p(x)
+end.
+
+(* brak konkretnego dowodu *)
+goal noExpr: (V x. r(x)) => V y. V x. r(x)
+proof
+[V x. r(x):
+  [[y0]:
+    V x. r(x) 
+  ];
+  V y. V x. r(x)
+]
+end.
+
+(* wprowadzenie świeżej zmiennej z złym typem *)
+proof
+[[x0:Nat]:
+  [[y0:Nat]:
+    [[z0:List]:
+      [x0 = y0 /\ y0 = z0:
+        x0 = y0;
+        y0 = z0;
+        x0 = z0
+      ];
+      (x0 = y0 /\ y0 = z0 => x0 = z0)
+    ];
+    V z:Nat. (x0 = y0 /\ y0 = z => x0 = z)
+  ];
+  V y:Nat. V z:Nat. (x0 = y /\ y = z => x0 = z)
+];
+V x:Nat. V y:Nat. V z:Nat. (x = y /\ y = z => x = z)
+end.
+
+(* oczekiwana świeża zmienna typu Nat *)
+proof
+[[x0]:
+  [[y0]:
+    [[z0]:
+      [x0 = y0 /\ y0 = z0:
+        x0 = y0;
+        y0 = z0;
+        x0 = z0
+      ];
+      (x0 = y0 /\ y0 = z0 => x0 = z0)
+    ];
+    V z:Nat. (x0 = y0 /\ y0 = z => x0 = z)
+  ];
+  V y:Nat. V z:Nat. (x0 = y /\ y = z => x0 = z)
+];
+V x:Nat. V y:Nat. V z:Nat. (x = y /\ y = z => x = z)
+end.
+
+axiom V x:Nat. V y:List. ( plus(x, y) = plus(y, x) ).
+
+(* próba wprowadzenia zmiennej y0 typu List, gdzie y0 w dowodzie jest typu Nat *)
+proof
+[[x0: Nat]:
+  [[y0: Nat]:
+  	    V x0 : Nat. V y0 : List. ( plus(x0, y0) = plus(y0, x0) );
+      V y0 : List. ( plus(x0, y0) = plus(y0, x0) );
+    plus(x0, y0) = plus(y0, x0)
+  ];
+  V y:Nat. ( plus(x0, y) = plus(y, x0) )
+];
+V x:Nat. V y:Nat. ( plus(x, y) = plus(y, x) )
 end.

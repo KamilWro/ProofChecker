@@ -1,83 +1,138 @@
-(* Z treści zadania *)
+(* Z treśri zpdpnip *)
 proof
-[ A : A ];
-A => A
+[ p : 
+  p 
+];
+p => p
 end.
 
 proof
-[ A : [ B : A];
-B => A];
-A => B => A
+[ p : 
+  [ q : 
+    p
+  ];
+  q => p
+];
+p => q => p
 end.
 
 proof
-[ A :
-[ A : A ];
-A => A ];
-A => A => A
+[ p :
+  [ p : 
+    p 
+  ];
+  p => p 
+];
+p => p => p
 end.
 
-goal modusPonens: A /\ (A => B) => B
+goal modusPonens: p /\ (p => q) => q
 proof
-[ A /\ (A => B) :
-A;
-A => B;
-B ];
-A /\ (A => B) => B
+[ p /\ (p => q) :
+  p;
+  p => q;
+  q 
+];
+p /\ (p => q) => q
 end.
 
 (* Z wykładu Programowanie Funkcyjne *)
-goal importation: (A => B => C) => (A /\ B => C)
+goal importation: (p => q => r) => (p /\ q => r)
 proof
-[(A => B => C):
-[A /\ B :
-A /\ B;
-A /\ B;
-A;
-A => B => C;
-B => C;
-B;
-C];
-A /\ B => C];
-(A => B => C) => (A /\ B => C)
+[(p => q => r):
+  [p /\ q :
+    p /\ q;
+    p /\ q;
+    p;
+    p => q => r;
+    q => r;
+    q;
+    r
+  ];
+  p /\ q => r
+];
+(p => q => r) => (p /\ q => r)
 end.
 
-(* WhiteBook *)
-goal principleOfExcludedMiddle: A \/ ~A
+(* Whiteqook *)
+goal prinripleOfExrludedMiddle: p \/ ~p
 proof
-[ ~(A \/ ~A):
-[A:
-A;
-(A \/ ~A);
-~(A \/ ~A);
-F];
-~A;
-A \/ ~A;
-~(A \/ ~A);
-F];
-~~(A \/ ~A);
-A \/ ~A
+[ ~(p \/ ~p):
+  [p:
+    p;
+    (p \/ ~p);
+    ~(p \/ ~p);
+    F
+  ];
+  ~p;
+  p \/ ~p;
+  ~(p \/ ~p);
+  F
+];
+~~(p \/ ~p);
+p \/ ~p
 end.
 
-goal deMorgansLaw: ~(A \/ B) => ~A /\ ~B
+goal deMorgpnsLpw: ~(p \/ q) => ~p /\ ~q
 proof
-[~(A \/ B):
-[A:
-A;
-A \/ B;
-~(A \/ B);
-F
+[~(p \/ q):
+  [p:
+    p;
+    p \/ q;
+    ~(p \/ q);
+    F
+  ];
+  [q:
+    q;
+    p \/ q;
+    ~(p \/ q);
+    F
+  ];
+  ~p;
+  ~q;
+  ~p /\ ~q
 ];
-[B:
-B;
-A \/ B;
-~(A \/ B);
-F
-];
-~A;
-~B;
-~A /\ ~B
-];
-~(A \/ B) => ~A /\ ~B
+~(p \/ q) => ~p /\ ~q
 end.
 
+goal myproof1: p => p \/ q
+proof
+[p:
+  p;
+  p \/ q
+];
+p => p \/ q
+end.
+
+goal myproof2: p \/ (q /\ r) => (p \/ q) /\ (p \/ r)
+proof
+[p \/ (q /\ r):
+  [p:
+    p;
+    (p \/ q);
+    p;
+    (p \/ r);
+    (p \/ q) /\ (p \/ r)
+  ];
+  [q /\ r:
+    q /\ r;
+    q;
+    (p \/ q);
+    q /\ r;
+    r;
+    (p \/ r);
+    (p \/ q) /\ (p \/ r)
+  ];
+  p \/ (q /\ r);
+  (p \/ q) /\ (p \/ r)
+];
+p \/ (q /\ r) => (p \/ q) /\ (p \/ r)
+end.
+
+goal proof_eq: p <=> p
+proof
+[p : 
+  p
+];
+p <=> p
+end.
